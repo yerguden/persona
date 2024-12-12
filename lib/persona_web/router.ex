@@ -19,11 +19,7 @@ defmodule PersonaWeb.Router do
 
     get "/", PageController, :home
 
-    live "/files", FileLive.Index, :index
-    live "/files/new", FileLive.Index, :new
-    live "/files/:id/edit", FileLive.Index, :edit
-
-    live "/files/:id", FileLive.Show, :show
+    live "/admin/files", AdminLive
     live "/files/:id/show/edit", FileLive.Show, :edit
   end
 
