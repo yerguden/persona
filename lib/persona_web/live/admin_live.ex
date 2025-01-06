@@ -1,79 +1,93 @@
+# lib/my_app_web/live/upload_live.ex
 defmodule PersonaWeb.AdminLive do
   use PersonaWeb, :live_view
 
-  @impl true
+  @bucket_name "persona"
+
+  @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    files = [
-      %{name: "File A", status: "processing"},
-      %{name: "File B", status: "done"},
-      %{name: "File C", status: "failed"}
-    ]
-
-    {:ok, assign(socket, files: files, upload: nil)}
+    {:ok,
+     socket
+     |> assign(:uploaded_files, [])
+     |> allow_upload(:file, accept: ~w(.txt .md), external: &presign_upload/2)}
   end
 
-  @impl true
-  def handle_event("upload", %{"file" => file}, socket) do
-    # Handle file upload logic here
-    {:noreply, assign(socket, upload: file)}
+  defp presign_upload(entry, socket) do
+    key = Ecto.UUID.generate()
+
+    {:ok, presigned_url} =
+      ExAws.Config.new(:s3)
+      |> ExAws.S3.presigned_url(:put, @bucket_name, key, expires_in: 300)
+
+    meta = %{uploader: "S3", url: presigned_url, fields: %{}}
+
+    {:ok, meta, socket}
   end
+
+  @impl Phoenix.LiveView
+  def handle_event("validate", _params, socket) do
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :file, ref)}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("save", _params, socket) do
+    {:noreply, socket}
+  end
+
+  defp error_to_string(:too_large), do: "Too large"
+  defp error_to_string(:too_many_files), do: "You have selected too many files"
+  defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
+  defp error_to_string(something), do: "#{something}"
 
   def render(assigns) do
+    IO.inspect(assigns.uploads.file.entries)
+
     ~H"""
-    <div class="admin-page">
-      <h1>Admin</h1>
+    <div>
+      <form id="upload-form" phx-submit="save" phx-change="validate">
+        <.live_file_input upload={@uploads.file} />
+        <button type="submit">Upload</button>
+      </form>
+      <%!-- lib/my_app_web/live/upload_live.html.heex --%>
 
-      <div class="upload-section">
-        <form phx-submit="upload">
-          <input type="file" name="file" accept=".md" />
-          <button type="submit">Upload</button>
-        </form>
-      </div>
+      <%!-- use phx-drop-target with the upload ref to enable file drag and drop --%>
+      <section phx-drop-target={@uploads.file.ref}>
+        <%!-- render each file entry --%>
+        <article :for={entry <- @uploads.file.entries} class="upload-entry">
+          <figure>
+            <.live_img_preview entry={entry} />
+            <figcaption>{entry.client_name}</figcaption>
+          </figure>
 
-      <div class="files-section">
-        <h2>Files</h2>
-        <table class="files-table">
-          <thead>
-            <tr>
-              <th>File Name</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <%= for file <- @files do %>
-              <tr>
-                <td>{file.name}</td>
-                <td>{file.status}</td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+          <%!-- entry.progress will update automatically for in-flight entries --%>
+          <progress value={entry.progress} max="100">{entry.progress}%</progress>
 
-      <style>
-        .admin-page {
-          font-family: Arial, sans-serif;
-          padding: 20px;
-        }
+          <%!-- a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 --%>
+          <button
+            type="button"
+            phx-click="cancel-upload"
+            phx-value-ref={entry.ref}
+            aria-label="cancel"
+          >
+            &times;
+          </button>
 
-        .upload-section {
-          margin-bottom: 20px;
-        }
+          <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
+          <p :for={err <- upload_errors(@uploads.file, entry)} class="alert alert-danger">
+            {error_to_string(err)}
+          </p>
+        </article>
 
-        .files-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        .files-table th, .files-table td {
-          border: 1px solid #ddd;
-          padding: 8px;
-        }
-
-        .files-table th {
-          background-color: #f4f4f4;
-        }
-      </style>
+        <%!-- Phoenix.Component.upload_errors/1 returns a list of error atoms --%>
+        <p :for={err <- upload_errors(@uploads.file)} class="alert alert-danger">
+          {error_to_string(err)}
+        </p>
+      </section>
     </div>
     """
   end

@@ -19,8 +19,8 @@ defmodule PersonaWeb.Router do
 
     get "/", PageController, :home
 
+    # Add password protection here 
     live "/admin/files", AdminLive
-    live "/files/:id/show/edit", FileLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
