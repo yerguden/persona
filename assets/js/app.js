@@ -31,7 +31,7 @@ Uploaders.S3 = function (entries, onViewError) {
     formData.append("file", entry.file);
     let xhr = new XMLHttpRequest();
     onViewError(() => xhr.abort());
-    xhr.onload = () => xhr.status === 204 || entry.error();
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) || entry.error();
     xhr.onerror = () => entry.error();
     xhr.upload.addEventListener("progress", (event) => {
       if (event.lengthComputable) {
