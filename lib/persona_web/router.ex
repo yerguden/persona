@@ -1,5 +1,6 @@
 defmodule PersonaWeb.Router do
   use PersonaWeb, :router
+  import Plug.BasicAuth
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -14,13 +15,22 @@ defmodule PersonaWeb.Router do
     plug :accepts, ["json"]
   end
 
+  defp admin_auth(conn, _opts) do
+    username = System.fetch_env!("ADMIN_USERNAME")
+    password = System.fetch_env!("ADMIN_PASSWORD")
+    Plug.BasicAuth.basic_auth(conn, username: username, password: password)
+  end
+
   scope "/", PersonaWeb do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
 
-    # Add password protection here 
-    live "/admin/files", AdminLive
+  scope "/admin", PersonaWeb do
+    pipe_through [:browser, :admin_auth]
+
+    live "/files", AdminLive
   end
 
   # Other scopes may use custom stacks.
