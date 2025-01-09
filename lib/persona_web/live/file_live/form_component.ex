@@ -8,7 +8,7 @@ defmodule PersonaWeb.FileLive.FormComponent do
     ~H"""
     <div>
       <.header>
-        <%= @title %>
+        {@title}
         <:subtitle>Use this form to manage file records in your database.</:subtitle>
       </.header>
 

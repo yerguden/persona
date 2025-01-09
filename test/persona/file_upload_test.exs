@@ -35,7 +35,12 @@ defmodule Persona.FileUploadTest do
 
     test "update_file/2 with valid data updates the file" do
       file = file_fixture()
-      update_attrs = %{size: 43, title: "some updated title", uploaded_at: ~N[2024-12-10 23:55:00]}
+
+      update_attrs = %{
+        size: 43,
+        title: "some updated title",
+        uploaded_at: ~N[2024-12-10 23:55:00]
+      }
 
       assert {:ok, %File{} = file} = FileUpload.update_file(file, update_attrs)
       assert file.size == 43

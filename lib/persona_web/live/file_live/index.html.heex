@@ -12,9 +12,9 @@
   rows={@streams.files}
   row_click={fn {_id, file} -> JS.navigate(~p"/files/#{file}") end}
 >
-  <:col :let={{_id, file}} label="Title"><%= file.title %></:col>
-  <:col :let={{_id, file}} label="Size"><%= file.size %></:col>
-  <:col :let={{_id, file}} label="Uploaded at"><%= file.uploaded_at %></:col>
+  <:col :let={{_id, file}} label="Title">{file.title}</:col>
+  <:col :let={{_id, file}} label="Size">{file.size}</:col>
+  <:col :let={{_id, file}} label="Uploaded at">{file.uploaded_at}</:col>
   <:action :let={{_id, file}}>
     <div class="sr-only">
       <.link navigate={~p"/files/#{file}"}>Show</.link>

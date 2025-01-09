@@ -1,5 +1,5 @@
 <.header>
-  File <%= @file.id %>
+  File {@file.id}
   <:subtitle>This is a file record from your database.</:subtitle>
   <:actions>
     <.link patch={~p"/files/#{@file}/show/edit"} phx-click={JS.push_focus()}>
@@ -9,9 +9,9 @@
 </.header>
 
 <.list>
-  <:item title="Title"><%= @file.title %></:item>
-  <:item title="Size"><%= @file.size %></:item>
-  <:item title="Uploaded at"><%= @file.uploaded_at %></:item>
+  <:item title="Title">{@file.title}</:item>
+  <:item title="Size">{@file.size}</:item>
+  <:item title="Uploaded at">{@file.uploaded_at}</:item>
 </.list>
 
 <.back navigate={~p"/files"}>Back to files</.back>
