@@ -1,5 +1,7 @@
 # lib/my_app_web/live/upload_live.ex
 defmodule PersonaWeb.AdminLive do
+  alias Persona.FileUpload
+  alias Phoenix.LiveView.UploadEntry
   use PersonaWeb, :live_view
 
   @bucket_name "persona"
@@ -19,7 +21,7 @@ defmodule PersonaWeb.AdminLive do
       ExAws.Config.new(:s3)
       |> ExAws.S3.presigned_url(:put, @bucket_name, key, expires_in: 300)
 
-    meta = %{uploader: "S3", url: presigned_url, fields: %{}}
+    meta = %{uploader: "S3", url: presigned_url, key: key, fields: %{}}
 
     {:ok, meta, socket}
   end
@@ -36,17 +38,23 @@ defmodule PersonaWeb.AdminLive do
 
   @impl Phoenix.LiveView
   def handle_event("save", _params, socket) do
+    consume_uploaded_entries(socket, :file, fn %{key: key},
+                                               %UploadEntry{
+                                                 client_name: title,
+                                                 client_size: size
+                                               } ->
+      FileUpload.create_file(%{s3_key: key, size: size, title: title})
+    end)
+
     {:noreply, socket}
   end
 
   defp error_to_string(:too_large), do: "Too large"
   defp error_to_string(:too_many_files), do: "You have selected too many files"
   defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
-  defp error_to_string(something), do: "#{something}"
+  defp error_to_string(_), do: "Something went wrong"
 
   def render(assigns) do
-    IO.inspect(assigns.uploads.file.entries)
-
     ~H"""
     <div>
       <form id="upload-form" phx-submit="save" phx-change="validate">

@@ -7,7 +7,7 @@ defmodule Persona.FileUpload.File do
   schema "files" do
     field :size, :integer
     field :title, :string
-    field :uploaded_at, :naive_datetime
+    field :s3_key, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -15,7 +15,7 @@ defmodule Persona.FileUpload.File do
   @doc false
   def changeset(file, attrs) do
     file
-    |> cast(attrs, [:title, :size, :uploaded_at])
-    |> validate_required([:title, :size, :uploaded_at])
+    |> cast(attrs, [:title, :size, :s3_key])
+    |> validate_required([:title, :size, :s3_key])
   end
 end
