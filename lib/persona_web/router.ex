@@ -30,7 +30,7 @@ defmodule PersonaWeb.Router do
   scope "/admin", PersonaWeb do
     pipe_through [:browser, :admin_auth]
 
-    live "/files", AdminLive
+    live "/files", AdminFilesLive
   end
 
   # Other scopes may use custom stacks.

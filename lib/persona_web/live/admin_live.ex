@@ -1,5 +1,4 @@
-# lib/my_app_web/live/upload_live.ex
-defmodule PersonaWeb.AdminLive do
+defmodule PersonaWeb.AdminFilesLive do
   alias Persona.FileUpload
   alias Phoenix.LiveView.UploadEntry
   use PersonaWeb, :live_view
