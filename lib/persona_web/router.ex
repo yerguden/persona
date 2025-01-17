@@ -16,8 +16,9 @@ defmodule PersonaWeb.Router do
   end
 
   defp admin_auth(conn, _opts) do
-    username = System.fetch_env!("ADMIN_USERNAME")
-    password = System.fetch_env!("ADMIN_PASSWORD")
+    username = Application.fetch_env!(:persona, :admin_username)
+    password = Application.fetch_env!(:persona, :admin_password)
+
     Plug.BasicAuth.basic_auth(conn, username: username, password: password)
   end
 

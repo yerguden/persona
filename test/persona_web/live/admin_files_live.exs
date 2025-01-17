@@ -4,8 +4,8 @@ defmodule AdminFilesLiveTest do
   import Phoenix.LiveViewTest
   import Persona.FileUploadFixtures
 
-  @admin_username System.fetch_env!("ADMIN_USERNAME")
-  @admin_password System.fetch_env!("ADMIN_PASSWORD")
+  @admin_username Application.fetch_env!(:persona, :admin_username)
+  @admin_password Application.fetch_env!(:persona, :admin_password)
 
   def log_in_admin(conn) do
     # Encode Basic Auth credentials
