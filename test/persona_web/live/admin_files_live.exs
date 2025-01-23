@@ -23,5 +23,14 @@ defmodule AdminFilesLiveTest do
 
       assert render(view) =~ "Upload"
     end
+
+    test "shows existing files", %{conn: conn} do
+      conn = log_in_admin(conn)
+      file = file_fixture()
+
+      {:ok, view, _html} = live(conn, "/admin/files")
+
+      assert render(view) =~ file.title
+    end
   end
 end

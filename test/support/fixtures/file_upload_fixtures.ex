@@ -13,7 +13,8 @@ defmodule Persona.FileUploadFixtures do
       |> Enum.into(%{
         size: 42,
         title: "some title",
-        uploaded_at: ~N[2024-12-09 23:55:00]
+        uploaded_at: ~N[2024-12-09 23:55:00],
+        s3_key: "some key"
       })
       |> Persona.FileUpload.create_file()
 
