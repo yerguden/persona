@@ -76,6 +76,10 @@ if config_env() == :prod do
     host: "fly.storage.tigris.dev",
     region: "auto"
 
+  config :persona,
+    admin_username: {:system, "ADMIN_USERNAME"},
+    admin_password: {:system, "ADMIN_PASSWORD"}
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

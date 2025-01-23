@@ -29,6 +29,8 @@ config :persona, PersonaWeb.Endpoint,
     tailwind: {Tailwind, :install_and_run, [:persona, ~w(--watch)]}
   ]
 
+config :persona, admin_username: "test", admin_password: "test"
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
