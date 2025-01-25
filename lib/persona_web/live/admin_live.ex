@@ -10,6 +10,7 @@ defmodule PersonaWeb.AdminFilesLive do
     {:ok,
      socket
      |> assign(:uploaded_files, [])
+     |> stream(:files, FileUpload.list_files())
      |> allow_upload(:file, accept: ~w(.txt .md), external: &presign_upload/2)}
   end
 
@@ -94,6 +95,16 @@ defmodule PersonaWeb.AdminFilesLive do
         <p :for={err <- upload_errors(@uploads.file)} class="alert alert-danger">
           {error_to_string(err)}
         </p>
+      </section>
+
+      <%!-- Display list of uploaded files --%>
+      <section>
+        <h3>Uploaded Files</h3>
+        <ul>
+          <li :for={{_id, file} <- @streams.files}>
+            <strong>{file.title}</strong> - {file.size} bytes
+          </li>
+        </ul>
       </section>
     </div>
     """
