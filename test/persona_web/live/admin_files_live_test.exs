@@ -52,7 +52,7 @@ defmodule AdminFilesLiveTest do
 
       # Assert the uploaded file is listed
       assert render(view) =~ "sample.txt"
-      assert render(view) =~ "#{File.stat!(@valid_file.path).size} bytes"
+      assert render(view) =~ "#{File.stat!("test/support/fixtures/sample.txt").size} bytes"
     end
   end
 end

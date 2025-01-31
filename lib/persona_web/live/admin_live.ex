@@ -38,15 +38,16 @@ defmodule PersonaWeb.AdminFilesLive do
 
   @impl Phoenix.LiveView
   def handle_event("save", _params, socket) do
-    consume_uploaded_entries(socket, :file, fn %{key: key},
-                                               %UploadEntry{
-                                                 client_name: title,
-                                                 client_size: size
-                                               } ->
-      FileUpload.create_file(%{s3_key: key, size: size, title: title})
-    end)
+    new_files =
+      consume_uploaded_entries(socket, :file, fn %{key: key},
+                                                 %UploadEntry{
+                                                   client_name: title,
+                                                   client_size: size
+                                                 } ->
+        FileUpload.create_file(%{s3_key: key, size: size, title: title})
+      end)
 
-    {:noreply, socket}
+    {:noreply, stream(socket, :files, new_files)}
   end
 
   defp error_to_string(:too_large), do: "Too large"
