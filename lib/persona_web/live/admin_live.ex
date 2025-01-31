@@ -15,7 +15,7 @@ defmodule PersonaWeb.AdminFilesLive do
      |> allow_upload(:file, accept: ~w(.txt .md), external: &presign_upload/2)}
   end
 
-  defp presign_upload(entry, socket) do
+  defp presign_upload(_entry, socket) do
     key = Ecto.UUID.generate()
 
     {:ok, presigned_url} =
@@ -55,6 +55,7 @@ defmodule PersonaWeb.AdminFilesLive do
   defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
   defp error_to_string(_), do: "Something went wrong"
 
+  @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
     <div>

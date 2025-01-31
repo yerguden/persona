@@ -4,8 +4,8 @@ defmodule AdminFilesLiveTest do
 
   import Persona.FileUploadFixtures
   import Mox
-  @admin_username Application.fetch_env!(:persona, :admin_username)
-  @admin_password Application.fetch_env!(:persona, :admin_password)
+  @admin_username Application.compile_env!(:persona, :admin_username)
+  @admin_password Application.compile_env!(:persona, :admin_password)
 
   # setup :verify_on_exit!
 
@@ -35,12 +35,13 @@ defmodule AdminFilesLiveTest do
       Persona.MockS3
       |> expect(:presigned_url, fn _operation, _bucket, _key, _opts -> {:ok, "url"} end)
 
-      existing_file = file_fixture()
       {:ok, view, _html} = conn |> log_in_admin() |> live("/admin/files")
+
+      file_path = "test/support/fixtures/sample.txt"
 
       valid_file = %{
         name: "sample.txt",
-        content: File.read!("test/support/fixtures/sample.txt"),
+        content: File.read!(file_path),
         type: "text/plain"
       }
 
@@ -52,7 +53,7 @@ defmodule AdminFilesLiveTest do
 
       # Assert the uploaded file is listed
       assert render(view) =~ "sample.txt"
-      assert render(view) =~ "#{File.stat!("test/support/fixtures/sample.txt").size} bytes"
+      assert render(view) =~ "#{File.stat!(file_path).size} bytes"
     end
   end
 end

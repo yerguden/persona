@@ -1,6 +1,5 @@
 defmodule PersonaWeb.Router do
   use PersonaWeb, :router
-  import Plug.BasicAuth
 
   pipeline :browser do
     plug :accepts, ["html"]
