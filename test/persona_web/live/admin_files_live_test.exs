@@ -1,11 +1,13 @@
 defmodule AdminFilesLiveTest do
   use PersonaWeb.ConnCase
+  import(Phoenix.LiveViewTest)
 
-  import Phoenix.LiveViewTest
   import Persona.FileUploadFixtures
-
+  import Mox
   @admin_username Application.fetch_env!(:persona, :admin_username)
   @admin_password Application.fetch_env!(:persona, :admin_password)
+
+  # setup :verify_on_exit!
 
   def log_in_admin(conn) do
     # Encode Basic Auth credentials
@@ -30,6 +32,9 @@ defmodule AdminFilesLiveTest do
     end
 
     test "saves new file", %{conn: conn} do
+      Persona.MockS3
+      |> expect(:presigned_url, fn _operation, _bucket, _key, _opts -> {:ok, "url"} end)
+
       existing_file = file_fixture()
       {:ok, view, _html} = conn |> log_in_admin() |> live("/admin/files")
 
@@ -39,13 +44,11 @@ defmodule AdminFilesLiveTest do
         type: "text/plain"
       }
 
-      IO.puts(File.read!("test/support/fixtures/sample.txt"))
-
       assert view
              |> file_input("form#upload-form", :file, [valid_file])
              |> render_upload("sample.txt")
 
-      assert view |> element("form#upload-form button[type=submit]") |> render_click()
+      assert view |> element("form#upload-form") |> render_submit()
 
       # Assert the uploaded file is listed
       assert render(view) =~ "sample.txt"

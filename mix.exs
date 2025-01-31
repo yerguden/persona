@@ -43,6 +43,7 @@ defmodule Persona.MixProject do
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
+      {:mox, "~> 1.2", only: :test},
       {:heroicons,
        github: "tailwindlabs/heroicons",
        tag: "v2.1.1",

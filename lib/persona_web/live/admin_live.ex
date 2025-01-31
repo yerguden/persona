@@ -1,6 +1,7 @@
 defmodule PersonaWeb.AdminFilesLive do
   alias Persona.FileUpload
   alias Phoenix.LiveView.UploadEntry
+  alias Persona.Storage.S3Client
   use PersonaWeb, :live_view
 
   @bucket_name "persona"
@@ -18,8 +19,7 @@ defmodule PersonaWeb.AdminFilesLive do
     key = Ecto.UUID.generate()
 
     {:ok, presigned_url} =
-      ExAws.Config.new(:s3)
-      |> ExAws.S3.presigned_url(:put, @bucket_name, key, expires_in: 300)
+      S3Client.presigned_url(:put, @bucket_name, key, expires_in: 300)
 
     meta = %{uploader: "S3", url: presigned_url, key: key, fields: %{}}
 
@@ -59,7 +59,7 @@ defmodule PersonaWeb.AdminFilesLive do
     <div>
       <form id="upload-form" phx-submit="save" phx-change="validate">
         <.live_file_input upload={@uploads.file} />
-        <button type="submit">Upload</button>
+        <button id="submit" type="submit">Upload</button>
       </form>
       <%!-- lib/my_app_web/live/upload_live.html.heex --%>
 
