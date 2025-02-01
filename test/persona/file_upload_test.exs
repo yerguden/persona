@@ -8,7 +8,7 @@ defmodule Persona.FileUploadTest do
 
     import Persona.FileUploadFixtures
 
-    @invalid_attrs %{size: nil, title: nil, uploaded_at: nil}
+    @invalid_attrs %{size: nil, title: nil}
 
     test "list_files/0 returns all files" do
       file = file_fixture()
@@ -21,12 +21,11 @@ defmodule Persona.FileUploadTest do
     end
 
     test "create_file/1 with valid data creates a file" do
-      valid_attrs = %{size: 42, title: "some title", uploaded_at: ~N[2024-12-09 23:55:00]}
+      valid_attrs = %{size: 42, title: "some title", s3_key: "some key"}
 
       assert {:ok, %File{} = file} = FileUpload.create_file(valid_attrs)
       assert file.size == 42
       assert file.title == "some title"
-      assert file.uploaded_at == ~N[2024-12-09 23:55:00]
     end
 
     test "create_file/1 with invalid data returns error changeset" do
@@ -38,14 +37,12 @@ defmodule Persona.FileUploadTest do
 
       update_attrs = %{
         size: 43,
-        title: "some updated title",
-        uploaded_at: ~N[2024-12-10 23:55:00]
+        title: "some updated title"
       }
 
       assert {:ok, %File{} = file} = FileUpload.update_file(file, update_attrs)
       assert file.size == 43
       assert file.title == "some updated title"
-      assert file.uploaded_at == ~N[2024-12-10 23:55:00]
     end
 
     test "update_file/2 with invalid data returns error changeset" do
