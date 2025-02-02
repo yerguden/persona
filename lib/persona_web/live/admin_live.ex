@@ -50,6 +50,14 @@ defmodule PersonaWeb.AdminFilesLive do
     {:noreply, stream(socket, :files, new_files)}
   end
 
+  @impl Phoenix.LiveView
+  def handle_event("delete", %{"id" => id}, socket) do
+    FileUpload.get_file!(id)
+    |> FileUpload.delete_file()
+
+    {:noreply, stream_delete(socket, :files, %{id: id})}
+  end
+
   defp error_to_string(:too_large), do: "Too large"
   defp error_to_string(:too_many_files), do: "You have selected too many files"
   defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
@@ -103,8 +111,15 @@ defmodule PersonaWeb.AdminFilesLive do
       <section>
         <h3>Uploaded Files</h3>
         <ul>
-          <li :for={{_id, file} <- @streams.files}>
-            <strong>{file.title}</strong> - {file.size} bytes
+          <li :for={{id, file} <- @streams.files} id={id} }>
+            <strong>{file.title}</strong>
+            - {file.size} bytes
+            <.link
+              phx-click={JS.push("delete", value: %{id: file.id}) |> hide("##{id}")}
+              data-confirm="Are you sure?"
+            >
+              Delete
+            </.link>
           </li>
         </ul>
       </section>

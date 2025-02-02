@@ -1,4 +1,5 @@
 defmodule AdminFilesLiveTest do
+  alias Persona.FileUpload
   use PersonaWeb.ConnCase
   import(Phoenix.LiveViewTest)
 
@@ -54,6 +55,17 @@ defmodule AdminFilesLiveTest do
       # Assert the uploaded file is listed
       assert render(view) =~ "sample.txt"
       assert render(view) =~ "#{File.stat!(file_path).size} bytes"
+    end
+
+    test "deletes existing file", %{conn: conn} do
+      {existing_file, _other_file} = {file_fixture(), file_fixture()}
+
+      {:ok, view, _html} = conn |> log_in_admin() |> live("/admin/files")
+
+      assert view |> element("#files-#{existing_file.id} a", "Delete") |> render_click()
+
+      assert_raise Ecto.NoResultsError, fn -> FileUpload.get_file!(existing_file.id) end
+      refute has_element?(view, "#files-#{existing_file.id}")
     end
   end
 end
