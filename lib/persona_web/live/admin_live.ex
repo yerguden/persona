@@ -110,7 +110,7 @@ defmodule PersonaWeb.AdminFilesLive do
       <%!-- Display list of uploaded files --%>
       <section>
         <h3>Uploaded Files</h3>
-        <ul>
+        <ul id="files" phx-update="stream">
           <li :for={{id, file} <- @streams.files} id={id} }>
             <strong>{file.title}</strong>
             - {file.size} bytes
