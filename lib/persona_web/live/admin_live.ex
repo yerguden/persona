@@ -1,4 +1,5 @@
 defmodule PersonaWeb.AdminFilesLive do
+  alias Persona.FileProcessor
   alias Persona.FileUpload
   alias Phoenix.LiveView.UploadEntry
   alias Persona.Storage.S3Client
@@ -46,6 +47,9 @@ defmodule PersonaWeb.AdminFilesLive do
                                                  } ->
         FileUpload.create_file(%{s3_key: key, size: size, title: title})
       end)
+
+    Enum.map(new_files, fn file -> Task.async(fn -> FileProcessor.process_file(file) end) end)
+    |> Enum.map(&Task.await/1)
 
     {:noreply, stream(socket, :files, new_files)}
   end
